@@ -121,6 +121,11 @@
     font-size: .8rem; font-weight: 500;
   }
   .layer-title h3 { font-size: 1.35rem; font-weight: 600; font-variation-settings: "SOFT" 30; }
+  .addon-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: .62rem; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--stamp);
+    border: 1px solid var(--stamp); padding: .12rem .45rem; align-self: center;
+  }
   .layer-q { font-style: italic; color: var(--ink-soft); font-size: .95rem; margin-bottom: .9rem; }
   .layer ol { list-style: none; }
   .layer li a {
@@ -217,14 +222,14 @@
     <div class="premise-body">
       <p class="kicker">The model in the loop will change. The harness is what compounds.</p>
       <p>You are one person. Your “engineering team” is you plus one or more AI assistants — and the thing that makes that work is not the model. It is the <strong>harness</strong>: the repo conventions, commands, gates, and documents that let any assistant pick up work, verify its own output, and ship, without you re-explaining the project every session.</p>
-      <p>A solo developer’s constraint is no longer typing speed; it is <strong>verified attention</strong> — how much shipped change you can actually stand behind. Each of the sixteen patterns here converts something you would have to remember, repeat, or manually check into something the repository enforces.</p>
+      <p>A solo developer’s constraint is no longer typing speed; it is <strong>verified attention</strong> — how much shipped change you can actually stand behind. Each pattern here converts something you would have to remember, repeat, or manually check into something the repository enforces — and an optional corporate layer bridges the same loop to Jira, GitHub Issues, ClickUp, Monday, or Redmine.</p>
     </div>
   </section>
 
   <section class="toc reveal">
     <div class="toc-head">
       <h2>The patterns</h2>
-      <span class="count">16 patterns · 7 layers</span>
+      <span class="count">18 patterns · 7 layers + 1 optional add-on</span>
     </div>
     <div class="layers">
 
@@ -290,6 +295,15 @@
           <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-14-memory-index-and-leaves"><span class="p-num">14</span>Memory Index and Leaves<span class="leader"></span></a></li>
           <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-15-session-ledger"><span class="p-num">15</span>Session Ledger<span class="leader"></span></a></li>
           <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-16-annotated-sitemap"><span class="p-num">16</span>Annotated Sitemap<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">VIII</span><h3>Corporate</h3><span class="addon-tag">optional add-on</span></div>
+        <p class="layer-q">How does work flow in from the org’s tracker, and how much autonomy does each ticket get?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-17-ticket-bridge"><span class="p-num">17</span>Ticket Bridge<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-18-automation-tier-policy"><span class="p-num">18</span>Automation Tier Policy<span class="leader"></span></a></li>
         </ol>
       </div>
 

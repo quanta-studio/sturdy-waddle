@@ -48,6 +48,7 @@ If you can walk that chain in both directions for any shipped feature, the harne
 | Release | How does it reach users? | 12 |
 | Human QA | What can only a human judge? | 13 |
 | Memory & orientation | What persists between sessions, where does everything live, and who is working on what right now? | 14, 15, 16 |
+| Corporate *(optional add-on)* | How does work flow in from the org's tracker, and how much autonomy does each ticket get? | 17, 18 |
 
 ---
 
@@ -453,6 +454,72 @@ Read protocol for agents, stated in the constitution: **consult the sitemap befo
 
 ---
 
+## Layer 8 — Corporate Integration *(optional add-on)*
+
+Solo founders can skip this layer entirely. Adopt it when the work arrives through an organization's project-management platform — Jira, GitHub Issues, ClickUp, Monday.com, Redmine, Linear — rather than through your own specs. The rest of the stack does not change; this layer only adds an **intake pipe in** and a **reporting pipe out**.
+
+### Pattern 17: Ticket Bridge
+
+**Context:** The organization already runs on a tracker. Tickets, priorities, and stakeholder conversations live there. Most trackers expose an API — some now ship their own AI agents that integrate with GitHub, GitLab, or self-hosted source control.
+
+**Problem:** Two sources of truth. If agents work directly from tickets, the repo loses its canon (Pattern 1): tickets are written for humans mid-conversation — vague, duplicated, missing acceptance criteria — and ticket edits silently change the target mid-flight. But ignoring the tracker is not an option either; it is where the org watches progress.
+
+**Therefore:** Treat the tracker as an **inbox and a reporting surface — never the canon.** A bridge (scheduled agent session, webhook worker, or the tracker's own AI agent) moves work across the boundary in both directions, and everything between the two pipes is the unchanged Layers 1–7:
+
+```
+     tracker (Jira / GitHub Issues / ClickUp / Monday / Redmine)
+        │ 1. FETCH      new + updated tickets, via API/MCP, on a schedule
+        ▼
+     2. NORMALIZE       ticket → draft spec docs/specs/S-NNN.md
+                        carrying the external ID: "S-041 (JIRA PROJ-1234)"
+        ▼
+     3. TRIAGE          severity × risk → automation tier (Pattern 18)
+        ▼
+     4. EXECUTE         the normal loop: plan → build → verify → PR
+        ▼
+     5. REPORT BACK     spec link on ticket, status transitions, PR link,
+                        evidence attachments, release note on close
+```
+
+The rules that keep the canon intact:
+
+- **A ticket never drives work directly.** It is normalized into a spec first — acceptance criteria extracted or drafted, ambiguities listed as questions posted back onto the ticket. The spec is what gets built; the ticket ID rides along in the spec header, branch name, and commit trailer (`fix(api): handle expired token [S-041][PROJ-1234]`), extending the traceability thread end-to-end: *ticket → spec → plan → PR → release → ticket closed*.
+- **Ticket edits re-enter through the front door:** the bridge diffs changed tickets against their specs and flags drift for re-triage — it never silently mutates an in-flight spec.
+- **Report generously, in the tracker's language.** Status moves, PR links, and evidence land on the ticket automatically. Stakeholders should never need to open the repo to know where things stand — that is the courtesy that buys the repo its canonicity.
+- Vendor AI agents (e.g. a tracker's built-in assistant) slot in as *bridge implementations* — they may fetch and report, but execution happens in the repo, under the repo's gates.
+
+---
+
+### Pattern 18: Automation Tier Policy
+
+**Context:** Tickets vary enormously in blast radius: a typo fix, a P2 bug with a clean repro, a schema migration touching payment data. Corporates additionally need auditability — someone must be able to answer *who decided the machine was allowed to do this?*
+
+**Problem:** If the agent decides for itself how much autonomy each ticket deserves, the riskiest tickets meet the most confident automation. If every ticket requires full human ceremony, the pipeline is slower than having no automation at all.
+
+**Therefore:** A **human-authored, committed policy file** — `docs/policy/automation-tiers.md` — routes every triaged ticket into one of three tiers. Agents *apply* the policy; only humans *edit* it (enforceable via CODEOWNERS):
+
+```markdown
+# Automation Tier Policy                    owner: eng-lead · reviewed quarterly
+
+| Tier | Autonomy | Category (human-defined)                                  |
+|------|----------|-----------------------------------------------------------|
+| 1    | Full     | P3/P4 · dep patches, typos, log noise, flaky-test fixes, docs |
+| 2    | Partial  | P2 · bugs with repro, small features inside one module     |
+| 3    | Sign-off | P0/P1 · security, auth, payments, data migration, public API, anything cross-module |
+
+Unmatched or ambiguous → Tier 3. Always.
+```
+
+What each tier means in the operating loop:
+
+- **Tier 1 — fully automated: plan → fix.** The agent plans, fixes test-first, and the PR merges on a green gate (Pattern 8) without waiting for a human. The audit trail (spec, plan, PR, CI run) still exists; humans review the *stream* asynchronously, not each item.
+- **Tier 2 — partially automated: plan → judge → evidence → fix.** The agent plans; an **independent AI judge session** (fresh context, not the author) reviews the plan and the fix, and assembles an **evidence pack** attached to the PR and the ticket: reproduction steps, the failing-then-passing test, relevant logs or screenshots, and the judge's verdict. A human merges — but reviews evidence, not raw diffs, which is minutes instead of hours.
+- **Tier 3 — human sign-off before code.** The agent produces the plan and supporting evidence, then **stops**. A named human approves the plan — recorded on the plan doc (`Signed-off-by:`) and mirrored to the ticket — before any implementation begins. Execution then proceeds as Tier 2, including the human merge.
+
+Two properties make this pattern safe rather than decorative: **the default is the strictest tier** — an unclassifiable ticket is a Tier 3 ticket, so policy gaps fail closed; and **tier assignment is logged on the ticket at triage time** ("Triaged Tier 1 per policy §deps"), so every autonomous action traces back to a human-approved rule, not an agent's judgment call.
+
+---
+
 ## Default Toolchain (swap freely — the patterns don't change)
 
 | Concern | Default | Swaps |
@@ -464,6 +531,7 @@ Read protocol for agents, stated in the constitution: **consult the sitemap befo
 | E2E tests | Playwright | Cypress |
 | Versioning (P12) | semantic-release | changesets, release-please |
 | Deploy targets | Fly.io / Vercel / Cloud Run | anything with per-tag deploys + rollback |
+| Tracker bridge (P17, optional) | GitHub Issues / Jira via API or MCP | ClickUp, Monday.com, Redmine, Linear, vendor AI agents |
 | AI assistant | any | Claude Code, Codex, Cursor, Gemini — the harness is the constant |
 
 ---
@@ -490,6 +558,11 @@ language we follow exactly. Bootstrap it:
 6. Create SITEMAP.md: directory-level, one purpose annotation per line
    (Pattern 16). For empty modules, annotate intended purpose.
 7. Write docs/decisions/ADR-001 recording the adoption of this stack.
+8. OPTIONAL — only if we use a tracker (Jira, GitHub Issues, ClickUp,
+   Monday, Redmine): create docs/policy/automation-tiers.md with the
+   three-tier table for me to fill in (Pattern 18), and a stub spec
+   template that carries external ticket IDs (Pattern 17). Do not
+   configure any tracker credentials — I will do that myself.
 
 Then STOP and show me what you created. Do not write feature code —
 feature work starts with a spec (Pattern 3), which we write together.
