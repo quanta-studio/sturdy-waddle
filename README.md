@@ -49,6 +49,7 @@ If you can walk that chain in both directions for any shipped feature, the harne
 | Human QA | What can only a human judge? | 13 |
 | Memory & orientation | What persists between sessions, where does everything live, and who is working on what right now? | 14, 15, 16 |
 | Corporate *(optional add-on)* | How does work flow in from the org's tracker, and how much autonomy does each ticket get? | 17, 18, 19 |
+| Security & privacy *(add-on)* | How does security knowledge become permanent, and what must never leave your control? | 20, 21 |
 
 ---
 
@@ -552,6 +553,47 @@ A dense CONFIRMED column and a short, tolerable "Not verified" list *is* the sig
 
 ---
 
+## Layer 9 — Security & Privacy *(add-on)*
+
+An honest layer. It does not claim the harness makes you secure — no harness can, and an AI assistant cannot cover the unknowns. What it can do is guarantee two narrower things: **security knowledge, once gained, is never lost** (Pattern 20), and **the humans using the stack know exactly where the confidentiality line is** (Pattern 21).
+
+### Pattern 20: Security Learnings Become Tests
+
+**Context:** Security review is episodic — an audit, a pentest, an incident, a judge session catching an injection. Agent code generation is continuous. Between reviews, assistants keep producing code at full speed.
+
+**Problem:** Security knowledge evaporates fastest of all knowledge. The vulnerability class an auditor found in March is reintroduced by a fresh agent session in July, because nothing in the harness remembers March. And unknown vulnerabilities are, by definition, not coverable — so pretending the assistant "handles security" is the most dangerous claim in the stack.
+
+**Therefore:** Scope the claim honestly, then enforce it mechanically: **the harness cannot make you secure, but it can make you never insecure the same way twice.** Every piece of security knowledge that enters the project becomes a permanent, executable test in `tests/security/`, run inside `just check` (Pattern 8) — so the gate itself carries the accumulated security memory:
+
+1. **Every finding becomes a regression test for the *class*, not the instance.** A pentest finds one endpoint missing auth → the test that lands iterates *all* routes and asserts authentication, so the next new endpoint is born covered. An XSS in one form → a table-driven escaping test over every render path. Instance-tests protect one door; class-tests protect the pattern.
+2. **Specs for sensitive surfaces carry abuse criteria.** Any spec touching auth, payments, uploads, or user input gets negative acceptance criteria — *what must NOT happen* ("expired token never grants access", "response identical for existing and unknown emails") — which become tests like any other criterion (Pattern 7). The Human QA charter's "try to confuse it" probes (Pattern 13) feed the same corpus when they find something.
+3. **The mechanical baseline lives in the gate:** dependency audit, secret scanning, and static analysis run in `just check` — known-knowns belong to machines, not to review comments or memory.
+4. **The learning is dual-recorded:** the test enforces it; a memory leaf (Pattern 14) or ADR explains it, so future agents understand *why* the test exists and never "simplify" it away. Weakening or deleting anything under `tests/security/` is Tier 3 by definition (Pattern 18): human sign-off, always.
+
+What this deliberately does not claim: coverage of the unknown. Periodic human or external review remains necessary — the corpus is the **ratchet** that makes each review's findings permanent, so every audit strictly grows the floor instead of producing a report that fades.
+
+---
+
+### Pattern 21: The Confidentiality Line
+
+**Context:** This is the only pattern in the stack that is **a warning to the human, not an automation**. There is no verb, no gate, no agent protocol that enforces it — which is exactly why it must be written down.
+
+**Problem:** The stack normalizes handing context to AI assistants — specs, code, logs, tickets. Habit generalizes. One day the "context" is a customer database export, a client's contract, or production credentials, pasted into whatever model window is open — including free-tier tools with no data agreement, retention you can't audit, and training policies you never read.
+
+**Therefore, the line, stated plainly:**
+
+> **Never paste confidential data into an AI model you do not control.**
+> No credentials or keys. No customer PII. No client material under NDA. No unreleased financials. If you cannot answer *where this data is stored, for how long, and who can see it* — the answer is it does not go in.
+
+What makes the line easier to hold — supporting habits, not enforcement:
+
+- **Know your endpoints.** Use models under terms you have actually accepted deliberately: enterprise/zero-retention endpoints, self-hosted models, or vendors with a signed data-processing agreement. "Uncontrolled" means any model where you can't state the retention policy.
+- **The repo helps you by construction:** secrets never live in the repo anyway (env vars and secret managers only, enforced by the gate's secret scanning, Pattern 20) — so an assistant reading the repo cannot leak what was never there.
+- **Watch the side channels.** Evidence packs (Pattern 19), QA charters (Pattern 13), and ticket comments (Pattern 17) carry logs and screenshots — scrub PII and secrets *before* they're attached, because trackers and PRs are where confidential data quietly escapes into systems with different access rules.
+- **Write it into the constitution** (Pattern 2) so every agent session carries the rule: real user data never appears in specs, tests, fixtures, or evidence — synthetic data always.
+
+---
+
 ## Default Toolchain (swap freely — the patterns don't change)
 
 | Concern | Default | Swaps |
@@ -564,6 +606,7 @@ A dense CONFIRMED column and a short, tolerable "Not verified" list *is* the sig
 | Versioning (P12) | semantic-release | changesets, release-please |
 | Deploy targets | Fly.io / Vercel / Cloud Run | anything with per-tag deploys + rollback |
 | Tracker bridge (P17, optional) | GitHub Issues / Jira via API or MCP | ClickUp, Monday.com, Redmine, Linear, vendor AI agents |
+| Security baseline (P20) | gitleaks + `npm audit`/`pip-audit` + semgrep | trufflehog, Snyk, CodeQL, Dependabot |
 | AI assistant | any | Claude Code, Codex, Cursor, Gemini — the harness is the constant |
 
 ---
@@ -596,6 +639,9 @@ language we follow exactly. Bootstrap it:
    template that carries external ticket IDs (Pattern 17), and an
    evidence-pack template + `evidence` verb in the justfile (Pattern
    19). Do not configure any tracker credentials — I will do that myself.
+9. Create tests/security/ wired into `just check`, with secret scanning
+   and dependency audit in the gate (Pattern 20). Add the
+   confidentiality line and synthetic-data rule to AGENTS.md (Pattern 21).
 
 Then STOP and show me what you created. Do not write feature code —
 feature work starts with a spec (Pattern 3), which we write together.
@@ -616,6 +662,9 @@ Standing rules for every future session:
 - Orientation: consult SITEMAP.md before searching, search before
   scanning, never scan. Any PR that changes directory structure
   updates SITEMAP.md in the same PR (P16).
+- Security learnings become class-level tests in tests/security/;
+  weakening or deleting one requires my sign-off (P20). Never put real
+  user data or secrets in specs, tests, fixtures, or evidence (P21).
 ```
 
 ---
