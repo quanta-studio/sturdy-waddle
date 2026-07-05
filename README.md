@@ -52,6 +52,7 @@ If you can walk that chain in both directions for any shipped feature, the harne
 | Security & privacy *(add-on)* | How does security knowledge become permanent, and what must never leave your control? | 20, 21 |
 | Device repro *(add-on)* | What happens when a bug only exists on a physical device? | 22 |
 | Code strengthening *(add-on)* | How do unfinished features ship safely, and how do old clients keep working? | 23, 24 |
+| Image analysis *(add-on)* | How does an assistant see details instead of the gist? | 25 |
 
 ---
 
@@ -682,6 +683,39 @@ The division of labor, in one line: **flags gate what users *see* (client, rever
 
 ---
 
+## Layer 12 — Image Analysis *(add-on)*
+
+Adopt this layer wherever images carry requirements or evidence: design mockups to implement, QA screenshots to compare, evidence-pack captures (Pattern 19), asset sheets to slice. Its implementation recipe ships as a portable skill: **`skills/analyzing-images-in-detail/SKILL.md`**.
+
+### Pattern 25: Slice-and-Compose Image Analysis
+
+**Context:** Modern assistants can "view" images — but their vision runs on downsampled, whole-image input, and their training rewards gist-level description. Ask about a mockup and you get the layout story; the 1-pixel border, the `#f4f4f5`-vs-`#ffffff` background difference, and the 11px caption text silently vanish.
+
+**Problem:** Detail blindness is invisible to the person relying on the answer. The assistant *sounds* equally confident about the layout (which it saw) and the button's exact border color (which it guessed). Design-to-code drifts, screenshot comparisons miss regressions, and nobody can tell which statements were perception and which were plausible invention.
+
+**Therefore:** Never analyze a nontrivial image in one pass. **Slice it so each detail becomes the big picture of its own crop, measure what is measurable with tools, and only then compose.** The five passes:
+
+```
+1. OVERVIEW    full image once: background treatment, layout regions,
+               reading order → a component inventory with bounding boxes
+2. SLICE       crop each component to its own file (tools, not eyes);
+               magnify small crops until text is legibly large;
+               grid-slice when there are no natural components (sprite
+               sheets, sticker packs)
+3. INSPECT     view each crop alone: transcribe text at crop scale;
+               PROBE colors programmatically — exact pixel values from
+               the file, never estimated from looking
+4. RELATE      each component against its neighbors: alignment, spacing,
+               shared styles, continuations that cross crop boundaries
+5. COMPOSE     reassemble the component findings into the deliverable,
+               then check the composition against the full image once
+               more — does the described whole predict what's there?
+```
+
+The discipline that makes it work is the same as Pattern 19's: **measurement beats perception.** A color named without sampling a pixel is a guess; text transcribed from a full-resolution screenshot is a guess; both must come from the crop and the probe. And the relational pass matters because slicing destroys context — gradients, shadows, and alignment only exist *between* components, so step 4 is what step 2 owes back.
+
+---
+
 ## Default Toolchain (swap freely — the patterns don't change)
 
 | Concern | Default | Swaps |
@@ -759,6 +793,9 @@ Standing rules for every future session:
 - Unfinished features merge behind environment-matrix flags; breaking
   API changes get a new version, never an in-place change. Follow
   skills/implementing-feature-gates/SKILL.md exactly (P23, P24).
+- When image details matter (mockups, screenshots, assets): slice,
+  probe pixels, compose — follow skills/analyzing-images-in-detail/
+  SKILL.md; never state a color or small text you didn't probe (P25).
 ```
 
 ---
