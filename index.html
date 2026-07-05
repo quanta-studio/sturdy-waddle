@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Harness Engineering Stack — a pattern language for the AI-assisted SDLC</title>
+<meta name="description" content="A 16-pattern language for running a full software development lifecycle with AI assistants, as a team of one. A template repository for Claude, Codex, or any AI assistant.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f5efe3;
+    --paper-deep: #ece3d0;
+    --ink: #211c15;
+    --ink-soft: #57503f;
+    --rule: #c9bda3;
+    --stamp: #b53a1c;
+    --stamp-deep: #8e2c13;
+    --max: 62rem;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Fraunces", Georgia, serif;
+    font-optical-sizing: auto;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 70% -10%, rgba(181,58,28,.06), transparent 60%),
+      repeating-linear-gradient(0deg, transparent 0 31px, rgba(33,28,21,.035) 31px 32px);
+  }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  a { color: inherit; }
+  ::selection { background: var(--stamp); color: var(--paper); }
+
+  .frame { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; }
+
+  /* ---------- masthead ---------- */
+  header { padding: 4.5rem 0 3.5rem; border-bottom: 3px double var(--rule); }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .78rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--stamp); display: flex; align-items: center; gap: .75rem;
+    animation: rise .7s .05s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .eyebrow::after { content: ""; flex: 1; border-top: 1px solid var(--rule); }
+  h1 {
+    font-size: clamp(2.6rem, 7.2vw, 5.4rem);
+    font-weight: 640; font-variation-settings: "SOFT" 40, "WONK" 1;
+    line-height: 1.02; letter-spacing: -.015em;
+    margin: 1.4rem 0 1.2rem; max-width: 14ch;
+    animation: rise .7s .15s cubic-bezier(.2,.7,.2,1) both;
+  }
+  h1 em { font-style: italic; color: var(--stamp); }
+  .dek {
+    font-size: clamp(1.05rem, 2vw, 1.3rem); font-weight: 380;
+    color: var(--ink-soft); max-width: 44ch; font-style: italic;
+    animation: rise .7s .25s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .cta-row { display: flex; flex-wrap: wrap; gap: .9rem; margin-top: 2.2rem;
+    animation: rise .7s .35s cubic-bezier(.2,.7,.2,1) both; }
+  .btn {
+    font-family: "IBM Plex Mono", monospace; font-size: .85rem; font-weight: 500;
+    text-decoration: none; padding: .8rem 1.3rem; border: 1.5px solid var(--ink);
+    letter-spacing: .04em; transition: all .18s ease; display: inline-block;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); box-shadow: 4px 4px 0 var(--stamp); }
+  .btn-primary:hover { background: var(--stamp-deep); border-color: var(--stamp-deep); box-shadow: 6px 6px 0 var(--stamp); transform: translate(-2px,-2px); }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- the loop ---------- */
+  .loop-section { padding: 3.2rem 0; border-bottom: 1px solid var(--rule); }
+  .loop {
+    display: flex; flex-wrap: wrap; align-items: stretch; justify-content: center;
+    gap: 0; font-family: "IBM Plex Mono", monospace;
+  }
+  .loop-node {
+    border: 1.5px solid var(--ink); padding: 1rem 1.4rem; text-align: center;
+    background: var(--paper); position: relative; min-width: 8.2rem;
+    transition: all .18s ease;
+  }
+  .loop-node:hover { background: var(--ink); color: var(--paper); }
+  .loop-node:hover .loop-sub { color: var(--paper); opacity: .7; }
+  .loop-verb { font-weight: 500; font-size: .95rem; letter-spacing: .14em; }
+  .loop-sub { display: block; font-size: .68rem; color: var(--ink-soft); margin-top: .35rem; letter-spacing: .02em; }
+  .loop-arrow { align-self: center; padding: 0 .55rem; color: var(--stamp); font-size: 1.1rem; user-select: none; }
+  .loop-caption {
+    text-align: center; margin-top: 1.6rem; font-style: italic; color: var(--ink-soft);
+    font-size: .98rem;
+  }
+  .loop-caption .mono { font-style: normal; font-size: .85em; color: var(--stamp); }
+
+  /* ---------- premise ---------- */
+  .premise { padding: 4rem 0; border-bottom: 1px solid var(--rule);
+    display: grid; grid-template-columns: 1fr 2fr; gap: 3rem; }
+  .premise h2, .toc-head h2, .start h2 {
+    font-size: 1rem; font-family: "IBM Plex Mono", monospace; font-weight: 500;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--stamp);
+  }
+  .premise-body p { font-size: 1.12rem; font-weight: 380; max-width: 58ch; }
+  .premise-body p + p { margin-top: 1.1rem; }
+  .premise-body strong { font-weight: 620; }
+  .premise-body .kicker {
+    font-size: 1.45rem; font-weight: 540; line-height: 1.35; font-variation-settings: "SOFT" 30;
+    border-left: 3px solid var(--stamp); padding-left: 1.1rem; margin-bottom: 1.4rem;
+  }
+
+  /* ---------- table of patterns ---------- */
+  .toc { padding: 4rem 0; border-bottom: 1px solid var(--rule); }
+  .toc-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2.4rem; }
+  .toc-head .count { font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--ink-soft); }
+  .layers { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6rem 3.4rem; }
+  .layer { break-inside: avoid; }
+  .layer-title { display: flex; align-items: baseline; gap: .8rem; margin-bottom: .3rem; }
+  .layer-title .num {
+    font-family: "IBM Plex Mono", monospace; color: var(--stamp);
+    font-size: .8rem; font-weight: 500;
+  }
+  .layer-title h3 { font-size: 1.35rem; font-weight: 600; font-variation-settings: "SOFT" 30; }
+  .layer-q { font-style: italic; color: var(--ink-soft); font-size: .95rem; margin-bottom: .9rem; }
+  .layer ol { list-style: none; }
+  .layer li a {
+    display: flex; align-items: baseline; gap: .6rem; text-decoration: none;
+    padding: .32rem 0; font-size: 1.02rem; transition: color .15s ease;
+  }
+  .layer li a:hover { color: var(--stamp-deep); }
+  .layer li a:hover .p-num { background: var(--stamp); color: var(--paper); border-color: var(--stamp); }
+  .p-num {
+    font-family: "IBM Plex Mono", monospace; font-size: .7rem; font-weight: 500;
+    border: 1px solid var(--rule); padding: .1rem .4rem; color: var(--ink-soft);
+    transition: all .15s ease; flex-shrink: 0; transform: translateY(-1px);
+  }
+  .leader { flex: 1; border-bottom: 1px dotted var(--rule); transform: translateY(-4px); min-width: 1rem; }
+
+  /* ---------- start ---------- */
+  .start { padding: 4rem 0; }
+  .start h2 { margin-bottom: 2.2rem; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; counter-reset: step; }
+  .step {
+    border: 1.5px solid var(--ink); background: var(--paper); padding: 1.5rem 1.4rem 1.6rem;
+    position: relative; counter-increment: step;
+  }
+  .step::before {
+    content: "0" counter(step);
+    font-family: "IBM Plex Mono", monospace; font-size: .75rem; font-weight: 500;
+    position: absolute; top: -0.8rem; left: 1rem; background: var(--stamp); color: var(--paper);
+    padding: .15rem .5rem; letter-spacing: .1em;
+  }
+  .step h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: .5rem; }
+  .step p { font-size: .95rem; color: var(--ink-soft); }
+  .step code {
+    font-family: "IBM Plex Mono", monospace; font-size: .82em;
+    background: var(--paper-deep); padding: .1em .35em; border: 1px solid var(--rule);
+  }
+
+  /* ---------- footer ---------- */
+  footer {
+    border-top: 3px double var(--rule); padding: 2.2rem 0 3.5rem;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: var(--ink-soft);
+  }
+  footer a { color: var(--ink); text-decoration-color: var(--rule); }
+  footer a:hover { color: var(--stamp-deep); }
+
+  /* reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    *, .reveal { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+  }
+
+  @media (max-width: 760px) {
+    .premise { grid-template-columns: 1fr; gap: 1.2rem; }
+    .layers { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 1.8rem; }
+    .loop-arrow { display: none; }
+    .loop { gap: .6rem; }
+    header { padding-top: 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <header>
+    <p class="eyebrow">Template repository · use with Claude, Codex, or any AI assistant</p>
+    <h1>The Harness <em>Engineering</em> Stack</h1>
+    <p class="dek">A pattern language for running the full software development lifecycle with AI assistants — as a team of one.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/quanta-studio/sturdy-waddle/generate">Use this template →</a>
+      <a class="btn btn-ghost" href="https://github.com/quanta-studio/sturdy-waddle#readme">Read the patterns</a>
+    </div>
+  </header>
+
+  <section class="loop-section reveal">
+    <div class="loop" aria-label="The operating loop">
+      <div class="loop-node"><span class="loop-verb">PLAN</span><span class="loop-sub">spec + plan doc</span></div>
+      <span class="loop-arrow">─▶</span>
+      <div class="loop-node"><span class="loop-verb">BUILD</span><span class="loop-sub">TDD, own worktree</span></div>
+      <span class="loop-arrow">─▶</span>
+      <div class="loop-node"><span class="loop-verb">VERIFY</span><span class="loop-sub">one-command gate</span></div>
+      <span class="loop-arrow">─▶</span>
+      <div class="loop-node"><span class="loop-verb">SHIP</span><span class="loop-sub">CI/CD + release</span></div>
+      <span class="loop-arrow">─▶</span>
+      <div class="loop-node"><span class="loop-verb">LEARN</span><span class="loop-sub">human QA + memory</span></div>
+    </div>
+    <p class="loop-caption">One thread runs through it all: <span class="mono">spec → plan → commit → gate → release → QA charter</span> — walkable in both directions, for every shipped feature.</p>
+  </section>
+
+  <section class="premise reveal">
+    <h2>The premise</h2>
+    <div class="premise-body">
+      <p class="kicker">The model in the loop will change. The harness is what compounds.</p>
+      <p>You are one person. Your “engineering team” is you plus one or more AI assistants — and the thing that makes that work is not the model. It is the <strong>harness</strong>: the repo conventions, commands, gates, and documents that let any assistant pick up work, verify its own output, and ship, without you re-explaining the project every session.</p>
+      <p>A solo developer’s constraint is no longer typing speed; it is <strong>verified attention</strong> — how much shipped change you can actually stand behind. Each of the sixteen patterns here converts something you would have to remember, repeat, or manually check into something the repository enforces.</p>
+    </div>
+  </section>
+
+  <section class="toc reveal">
+    <div class="toc-head">
+      <h2>The patterns</h2>
+      <span class="count">16 patterns · 7 layers</span>
+    </div>
+    <div class="layers">
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">I</span><h3>Source of Truth</h3></div>
+        <p class="layer-q">What is true about this project?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-1-repo-as-single-source-of-truth"><span class="p-num">01</span>Repo as Single Source of Truth<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-2-agent-constitution"><span class="p-num">02</span>Agent Constitution<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-3-spec-before-code"><span class="p-num">03</span>Spec Before Code<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-4-decision-records"><span class="p-num">04</span>Decision Records<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">II</span><h3>Plan</h3></div>
+        <p class="layer-q">What are we building next, exactly?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-5-plan-as-reviewable-artifact"><span class="p-num">05</span>Plan as Reviewable Artifact<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">III</span><h3>Build &amp; Verify</h3></div>
+        <p class="layer-q">How does the assistant know it’s done?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-6-one-command-interface"><span class="p-num">06</span>One-Command Interface<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-7-test-first-loop"><span class="p-num">07</span>Test-First Loop<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-8-verification-gate"><span class="p-num">08</span>Verification Gate<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">IV</span><h3>Integrate</h3></div>
+        <p class="layer-q">How does work land safely — even with many agents at once?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-9-small-prs-on-trunk"><span class="p-num">09</span>Small PRs on Trunk<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-10-one-worktree-per-agent"><span class="p-num">10</span>One Worktree per Agent<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-11-ci-mirrors-local"><span class="p-num">11</span>CI Mirrors Local<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">V</span><h3>Release</h3></div>
+        <p class="layer-q">How does it reach users?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-12-release-from-the-ledger"><span class="p-num">12</span>Release from the Ledger<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">VI</span><h3>Human QA</h3></div>
+        <p class="layer-q">What can only a human judge?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-13-human-qa-charter"><span class="p-num">13</span>Human QA Charter<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="num">VII</span><h3>Memory &amp; Orientation</h3></div>
+        <p class="layer-q">What persists between sessions, where does everything live, and who is working on what right now?</p>
+        <ol>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-14-memory-index-and-leaves"><span class="p-num">14</span>Memory Index and Leaves<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-15-session-ledger"><span class="p-num">15</span>Session Ledger<span class="leader"></span></a></li>
+          <li><a href="https://github.com/quanta-studio/sturdy-waddle#pattern-16-annotated-sitemap"><span class="p-num">16</span>Annotated Sitemap<span class="leader"></span></a></li>
+        </ol>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="start reveal">
+    <h2>Start in three moves</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>Take the template</h3>
+        <p>Click <em>Use this template</em> on GitHub. You get the module skeleton — <code>backend/</code>, <code>web/</code>, <code>mobile-app/</code>, <code>webservices/</code> — and the full pattern language in the README.</p>
+      </div>
+      <div class="step">
+        <h3>Point any assistant at it</h3>
+        <p>Open the repo in Claude Code, Codex, Cursor — whatever you use. Paste the <a href="https://github.com/quanta-studio/sturdy-waddle#kickstart-prompt">kickstart prompt</a> from the README.</p>
+      </div>
+      <div class="step">
+        <h3>It scaffolds the harness</h3>
+        <p>Constitution, docs tree, <code>justfile</code> verbs, CI gate, memory index, session ledger, sitemap — then it stops, and feature work begins with a spec you approve.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Quanta Studio · MIT-spirited: take the patterns, keep the rigor.</span>
+    <span><a href="https://github.com/quanta-studio/sturdy-waddle">github.com/quanta-studio/sturdy-waddle</a></span>
+  </footer>
+
+</div>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+</script>
+
+</body>
+</html>
