@@ -1,0 +1,5 @@
+# Harness Engineering Stack (Pattern 10): agent worktrees are local-only, never committed
+.worktrees/
+
+# Add language/toolchain ignores per module as they gain a stack,
+# e.g. node_modules/, dist/, __pycache__/, .venv/, .env*
