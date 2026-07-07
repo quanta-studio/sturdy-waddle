@@ -395,6 +395,8 @@ The read protocol is progressive disclosure: **always load the index; open only 
 
 Boundary discipline is what prevents the burst: memory holds only *learned facts not derivable from the repo*. Rules you set live in the constitution (Pattern 2); decisions live in ADRs (Pattern 4); requirements live in specs (Pattern 3). When a memory hardens into a rule ("always run migrations before seeding"), promote it — move it into `AGENTS.md` or an ADR and delete the leaf.
 
+**When *not* to upgrade this pattern:** index-and-leaves already *is* a knowledge graph — leaves are nodes, cross-references are edges — so resist the urge to replace it with a formal one (typed relations, a graph database, a memory service). Those earn their keep at thousands of nodes with automated ingestion, not at the dozens of hand-written leaves a solo developer accumulates, and a memory service would be the first piece of the stack that doesn't travel with `git clone`. The ways memory actually fails — wrong leaf loaded, stale facts, duplicates of what the repo already says — are fixed by the read/write protocols above, not by richer edges. The honest test before adding structure: name a concrete question the current shape failed to answer. Until one exists, invest in denser cross-links between leaves instead — plain-markdown links are traversable with grep by humans and agents alike, and if you ever do outgrow them, well-linked markdown imports trivially into any graph tool later.
+
 ---
 
 ### Pattern 15: Session Ledger
