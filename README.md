@@ -6,6 +6,8 @@ You are one person. Your "engineering team" is you plus one or more AI assistant
 
 This README is that harness, written as a pattern language. Each pattern is small, named, and composable. Adopt them in order; each one makes the next one stronger. Any AI assistant pointed at this file can bootstrap a project that follows the same stack.
 
+> **Reference implementation:** [backend-harness-template](https://github.com/quanta-studio/backend-harness-template) — the patterns below, pre-wired for Node/TypeScript backends. Clone it instead of re-deriving them.
+
 ---
 
 ## The Operating Loop

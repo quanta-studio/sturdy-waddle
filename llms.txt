@@ -42,3 +42,4 @@ formation. (Pattern 26: Assisted Apprenticeship.)
 - [Intro site](https://quanta-studio.github.io/sturdy-waddle/)
 - [Kickstart prompt](https://github.com/quanta-studio/sturdy-waddle#kickstart-prompt): paste into any assistant to scaffold the harness
 - [Skills](https://github.com/quanta-studio/sturdy-waddle/tree/main/skills): portable implementation recipes (feature gates, image analysis)
+- [Reference implementation (Node/TS)](https://github.com/quanta-studio/backend-harness-template): the patterns pre-wired as a GitHub template repo
