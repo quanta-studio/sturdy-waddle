@@ -10,4 +10,4 @@ check:
 
 # Run the assembly-library unit tests
 test:
-    node --test scripts/lib/
+    node --test 'scripts/lib/**/*.test.mjs'

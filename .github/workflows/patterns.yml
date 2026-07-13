@@ -12,6 +12,6 @@ jobs:
         with:
           node-version: 22
       - name: Assembly library tests
-        run: node --test scripts/lib/
+        run: node --test 'scripts/lib/**/*.test.mjs'
       - name: README is in sync with patterns/
         run: node scripts/check-readme.mjs
