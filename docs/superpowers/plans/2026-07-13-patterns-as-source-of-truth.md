@@ -111,7 +111,7 @@ test("assembleIndexTable renders a sorted table", () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `node --test scripts/lib/`
+Run: `node --test 'scripts/lib/**/*.test.mjs'`
 Expected: FAIL — `Cannot find module '.../assemble.mjs'`.
 
 - [ ] **Step 3: Implement the library**
@@ -171,7 +171,7 @@ export function assembleIndexTable(patterns) {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `node --test scripts/lib/`
+Run: `node --test 'scripts/lib/**/*.test.mjs'`
 Expected: PASS — all 6 tests, `# fail 0`.
 
 - [ ] **Step 5: Commit**
@@ -466,7 +466,7 @@ check:
 
 # Run the assembly-library unit tests
 test:
-    node --test scripts/lib/
+    node --test 'scripts/lib/**/*.test.mjs'
 ```
 
 - [ ] **Step 2: Verify the runner (build is a no-op, check passes)**
@@ -478,7 +478,7 @@ Expected: PASS (exit 0).
 Run: `just test`
 Expected: all assembly tests pass.
 
-(If `just` is not installed, the same commands run as `node scripts/build-readme.mjs`, `node scripts/check-readme.mjs`, `node --test scripts/lib/`.)
+(If `just` is not installed, the same commands run as `node scripts/build-readme.mjs`, `node scripts/check-readme.mjs`, `node --test 'scripts/lib/**/*.test.mjs'`.)
 
 - [ ] **Step 3: Write the CI workflow**
 
@@ -499,7 +499,7 @@ jobs:
         with:
           node-version: 22
       - name: Assembly library tests
-        run: node --test scripts/lib/
+        run: node --test 'scripts/lib/**/*.test.mjs'
       - name: README is in sync with patterns/
         run: node scripts/check-readme.mjs
 ```
