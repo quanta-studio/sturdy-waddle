@@ -1,0 +1,17 @@
+name: patterns
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Assembly library tests
+        run: node --test scripts/lib/
+      - name: README is in sync with patterns/
+        run: node scripts/check-readme.mjs
