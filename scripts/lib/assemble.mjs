@@ -38,11 +38,28 @@ export function assemblePatternsRegion(patterns, layers) {
 
 export function assembleReadme({ templateText, layers, patterns }) {
   if (!templateText.includes(TOKEN)) throw new Error("template missing {{PATTERNS}} token");
-  return templateText.replace(TOKEN, assemblePatternsRegion(patterns, layers));
+  return templateText.replace(TOKEN, () => assemblePatternsRegion(patterns, layers));
 }
 
 export function assembleIndexTable(patterns) {
   const sorted = [...patterns].sort((a, b) => a.pattern - b.pattern);
   const rows = sorted.map((p) => `| ${p.pattern} | [${p.title}](${p.file}) | ${p.layer} |`);
   return ["| # | Pattern | Layer |", "|---|---|---|", ...rows].join("\n");
+}
+
+export function assertContiguousPatterns(patterns) {
+  const nums = patterns.map((p) => p.pattern);
+  const seen = new Set();
+  for (const n of nums) {
+    if (seen.has(n)) throw new Error(`duplicate pattern number: ${n}`);
+    seen.add(n);
+  }
+  const sorted = [...nums].sort((a, b) => a - b);
+  for (let i = 0; i < sorted.length; i++) {
+    if (sorted[i] !== i + 1) {
+      throw new Error(
+        `pattern numbers must be contiguous 1..N; got [${sorted.join(", ")}] (expected ${i + 1} at position ${i})`
+      );
+    }
+  }
 }

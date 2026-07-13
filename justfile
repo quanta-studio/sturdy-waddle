@@ -1,5 +1,9 @@
 # One-command interface (Pattern 6) for this docs repo.
 
+# List available recipes (default)
+default:
+    @just --list
+
 # Regenerate README.md + patterns/README.md from patterns/
 build:
     node scripts/build-readme.mjs

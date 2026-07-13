@@ -6,6 +6,7 @@ import {
   assemblePatternsRegion,
   assembleReadme,
   assembleIndexTable,
+  assertContiguousPatterns,
 } from "./assemble.mjs";
 
 test("parseFrontmatter splits meta and body", () => {
@@ -64,4 +65,30 @@ test("assembleIndexTable renders a sorted table", () => {
     rows,
     "| # | Pattern | Layer |\n|---|---|---|\n| 1 | [A](pattern-01-a.md) | 1 |\n| 2 | [B](pattern-02-b.md) | 1 |"
   );
+});
+
+test("assembleReadme inserts $ sequences literally (no replacement-pattern interpretation)", () => {
+  const templateText = "A\n\n---\n\n{{PATTERNS}}\n\n---\n\nB\n";
+  const out = assembleReadme({
+    templateText,
+    layers: [{ n: 1, name: "One" }],
+    patterns: [{ pattern: 1, layer: 1, body: "### Pattern 1: T\n\nuse $& and $$ and $`literal" }],
+  });
+  assert.ok(out.includes("use $& and $$ and $`literal"));
+});
+
+test("parseFrontmatter throws when frontmatter missing", () => {
+  assert.throws(() => parseFrontmatter("no frontmatter here"));
+});
+
+test("assemblePatternsRegion throws on unknown layer", () => {
+  assert.throws(() =>
+    assemblePatternsRegion([{ pattern: 1, layer: 9, body: "### Pattern 1: A\n\na" }], [{ n: 1, name: "One" }])
+  );
+});
+
+test("assertContiguousPatterns accepts 1..N and rejects gaps/dupes", () => {
+  assertContiguousPatterns([{ pattern: 2 }, { pattern: 1 }, { pattern: 3 }]);
+  assert.throws(() => assertContiguousPatterns([{ pattern: 1 }, { pattern: 3 }]));
+  assert.throws(() => assertContiguousPatterns([{ pattern: 1 }, { pattern: 1 }, { pattern: 2 }]));
 });
