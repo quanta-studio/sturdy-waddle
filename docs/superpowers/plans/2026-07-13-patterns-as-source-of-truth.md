@@ -373,7 +373,11 @@ for (let i = firstIdx; i <= lastIdx; i++) {
     currentLayer = entry.n;
     body = lm[3];
   }
-  const pm = /^### Pattern (\d+): (.+)/.exec(body);
+  // `m` flag: add-on layers (8–13) have an intro paragraph between the
+  // `## Layer N` header and their first `### Pattern` heading, so the heading
+  // is not always at position 0 of `body`. The intro prose stays in the body
+  // and round-trips faithfully.
+  const pm = /^### Pattern (\d+): (.+)/m.exec(body);
   if (!pm) throw new Error(`block ${i} is not a pattern: ${body.slice(0, 80)}`);
   const number = Number(pm[1]);
   const title = pm[2];
@@ -421,7 +425,7 @@ Expected: PASS — `README.md and patterns/README.md are in sync with patterns/.
 - [ ] **Step 9: Sanity-check a shareable pattern file**
 
 Run: `head -12 patterns/pattern-03-spec-before-code.md`
-Expected: frontmatter with `pattern: 3`, `title: Spec Before Code`, `slug: spec-before-code`, `layer: 2`, a `related:` list, then the verbatim `### Pattern 3: Spec Before Code` heading.
+Expected: frontmatter with `pattern: 3`, `title: Spec Before Code`, `slug: spec-before-code`, `layer: 1` (Pattern 3 is in Layer 1 — Source of Truth), a `related:` list, then the verbatim `### Pattern 3: Spec Before Code` heading.
 
 - [ ] **Step 10: Commit the migration**
 
