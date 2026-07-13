@@ -1,0 +1,60 @@
+[
+  {
+    "n": 1,
+    "name": "Source of Truth"
+  },
+  {
+    "n": 2,
+    "name": "Plan"
+  },
+  {
+    "n": 3,
+    "name": "Build & Verify"
+  },
+  {
+    "n": 4,
+    "name": "Integrate"
+  },
+  {
+    "n": 5,
+    "name": "Release"
+  },
+  {
+    "n": 6,
+    "name": "Human QA"
+  },
+  {
+    "n": 7,
+    "name": "Memory & Orientation"
+  },
+  {
+    "n": 8,
+    "name": "Corporate Integration",
+    "tag": "*(optional add-on)*"
+  },
+  {
+    "n": 9,
+    "name": "Security & Privacy",
+    "tag": "*(add-on)*"
+  },
+  {
+    "n": 10,
+    "name": "Device Repro",
+    "tag": "*(add-on)*"
+  },
+  {
+    "n": 11,
+    "name": "Code Strengthening",
+    "tag": "*(add-on)*"
+  },
+  {
+    "n": 12,
+    "name": "Image Analysis",
+    "tag": "*(add-on)*"
+  },
+  {
+    "n": 13,
+    "name": "Onboarding",
+    "tag": "*(add-on)*"
+  }
+]
